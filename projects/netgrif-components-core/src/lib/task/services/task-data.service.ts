@@ -35,6 +35,7 @@ import {ChangedFieldsService} from '../../changed-fields/services/changed-fields
 import {ChangedFieldsMap} from '../../event/services/interfaces/changed-fields-map';
 import {TaskFields} from '../../task-content/model/task-fields';
 import {EnumerationField} from "../../data-fields/enumeration-field/models/enumeration-field";
+import {OpenTaskService} from "./open-task.service";
 
 /**
  * Handles the loading and updating of data fields and behaviour of
@@ -106,6 +107,31 @@ export class TaskDataService extends TaskHandlingService implements OnDestroy {
      * @param force set to `true` if you need force reload of all task data
      */
     public initializeTaskDataFields(afterAction: AfterAction = new AfterAction(), force = false): void {
+        // console.log("1 -  OPEN TASK - make variable");
+        //
+        // let kokos = new OpenTaskService(this._log,
+        //     this._taskResourceService,
+        //     this._snackBar,
+        //     this._translate,
+        //     this._taskState,
+        //     this._taskEvent,
+        //     this._eventQueue,
+        //     this._eventService,
+        //     this._changedFieldsService,
+        //     this._taskOperations,
+        //     this._selectedCaseService,
+        //     null,
+        //     this._taskContentService
+        // );
+        //
+        // console.log("1 -  OPEN TASK - start schedule");
+        //
+        // kokos.openTask();
+
+        this.
+
+        //console.log("2 -  GET DATA");
+
         this._eventQueue.scheduleEvent(new QueuedEvent(
             () => {
                 return this.isTaskPresent();
@@ -214,6 +240,9 @@ export class TaskDataService extends TaskHandlingService implements OnDestroy {
                     });
                     if (field instanceof FileField || field instanceof FileListField) {
                         field.changedFields$.subscribe((change: ChangedFieldsMap) => {
+
+                            console.log("XXXXXXXXXXX");
+
                             this._changedFieldsService.emitChangedFields(change);
                         });
                     }

@@ -96,6 +96,19 @@ export class TaskResourceService extends AbstractResourceService implements Coun
     }
 
     /**
+     * Open task
+     * GET
+     */
+    // {{baseUrl}}/api/task/finish/:id
+    public openTask(taskId: string): Observable<EventOutcomeMessageResource> {
+
+        console.log("TASK RESOURCE -> openTask");
+
+        return this._resourceProvider.get$('task/opentask/' + taskId, this.SERVER_URL)
+            .pipe(map(r => this.changeType(r, undefined)));
+    }
+
+    /**
      * Searches tasks trough the Elastic endpoint.
      * POST
      * @param filterParam filter used to search the tasks. Must be of type `TASK`.

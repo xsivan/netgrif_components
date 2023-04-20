@@ -91,8 +91,10 @@ export function getFileData(tree: Tree, projectRootPath: string, relativeFilePat
     };
 }
 
-export function fileEntryToTsSource(file: FileEntry, encoding: string = 'utf8'): ts.SourceFile {
-    const source = getTsSource(file.path, file.content.toString(encoding));
+export function fileEntryToTsSource(file: FileEntry): ts.SourceFile {
+
+    const kokos = file.content.toString();
+    const source = getTsSource(file.path, kokos);
     if (source === null) {
         throw new SchematicsException(`'${file.path}' could not be read. Make sure it has UTF-8 encoding.`);
     }

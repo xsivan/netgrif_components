@@ -142,17 +142,39 @@ export abstract class AbstractTaskPanelComponent extends AbstractPanelWithImmedi
             this.taskEvent.emit(event);
         });
         this._subTaskData = _changedFieldsService.changedFields$.subscribe((changedFieldsMap: ChangedFieldsMap) => {
+
+            console.log("********_1_**********");
+            console.log("TU 1 : ", changedFieldsMap);
+            console.log("TU 2 : ", this._taskContentService.referencedTaskAndCaseIds);
+
             const filteredCaseIds: Array<string> = Object.keys(changedFieldsMap).filter(
                 caseId => Object.keys(this._taskContentService.referencedTaskAndCaseIds).includes(caseId)
             );
+
+            console.log("********_2_**********");
+            console.log("filteredCaseIds : ", filteredCaseIds);
+
             const changedFields: Array<ChangedFields> = [];
             filteredCaseIds.forEach(caseId => {
+
+                console.log("********_3_**********");
+
                 const taskIds: Array<string> = this._taskContentService.referencedTaskAndCaseIds[caseId];
                 changedFields.push(...this._changedFieldsService.parseChangedFieldsByCaseAndTaskIds(caseId, taskIds, changedFieldsMap));
             });
+
+            console.log("********_4_**********");
+
             changedFields.filter(fields => fields !== undefined).forEach(fields => {
+
+                console.log("********_5_**********");
+
                this.taskPanelData.changedFields.next(fields);
             });
+
+
+
+            console.log("********_6_**********");
         });
         _taskOperations.open$.subscribe(() => {
             this.expand();

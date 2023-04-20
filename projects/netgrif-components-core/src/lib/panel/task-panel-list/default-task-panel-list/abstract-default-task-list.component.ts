@@ -74,6 +74,10 @@ export abstract class AbstractDefaultTaskListComponent extends TabbedVirtualScro
      * @param event the event that will be emitted
      */
     public emitTaskEvent(event: TaskEventNotification) {
+        console.log("Emiting task event (type of TaskEventNotification): ", event);
+
+        console.log("TAsk event himself : ", this.taskEvent);
+
         this.taskEvent.emit(event);
     }
 

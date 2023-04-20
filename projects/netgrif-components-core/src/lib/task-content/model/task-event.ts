@@ -5,4 +5,5 @@ export enum TaskEvent {
     DELEGATE = 'delegate',
     SET_DATA = 'set data',
     GET_DATA = 'get data',
+    OPENTASK = 'opentask',
 }

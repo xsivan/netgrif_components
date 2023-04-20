@@ -110,6 +110,7 @@ export class AssignTaskService extends TaskHandlingService {
                             forceReload: boolean) {
         this._taskResourceService.assignTask(this._safeTask.stringId).pipe(take(1))
             .subscribe((outcomeResource: EventOutcomeMessageResource) => {
+
                 this._taskState.stopLoading(assignedTaskId);
                 if (!this.isTaskRelevant(assignedTaskId)) {
                     this._log.debug('current task changed before the assign response could be received, discarding...');
@@ -119,11 +120,14 @@ export class AssignTaskService extends TaskHandlingService {
 
                 if (outcomeResource.success) {
                     this._taskContentService.updateStateData(outcomeResource.outcome as AssignTaskEventOutcome);
+
                     const changedFieldsMap: ChangedFieldsMap = this._eventService
                         .parseChangedFieldsFromOutcomeTree(outcomeResource.outcome);
+
                     if (!!changedFieldsMap) {
                         this._changedFieldsService.emitChangedFields(changedFieldsMap);
                     }
+
                     forceReload ? this._taskOperations.forceReload() : this._taskOperations.reload();
                     this.completeActions(afterAction, nextEvent, true, outcomeResource.outcome as AssignTaskEventOutcome);
                     this._snackBar.openSuccessSnackBar(!!outcomeResource.outcome.message
