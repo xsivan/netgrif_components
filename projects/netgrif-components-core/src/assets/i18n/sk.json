@@ -39,8 +39,10 @@
             "caseDeleteFailed": "Prípad sa nepodarilo vymazať",
             "caseDeleteSuccess": "Prípad bol úspešne zmazaný",
             "rolesSuccessAssign": "Roly boli úspešne priradené vybraným používateľom",
-            "openTask": "Otvorenie úlohy",
-            "openTaskSuccess": "Úloha úspešne otvorená"
+            "openTask": "Udalosť otvorenia úlohy",
+            "openTaskSuccess": "Udalosť otvorenia úlohy, uspešne vykonaná",
+            "closeTask": "Udalosť zatvorenia úlohy",
+            "closeTaskSuccess": "Udalosť zatvorenia úlohy, uspešne vykonaná"
         },
         "view": {
             "noTasksSatisfyingThisFilter": "Pre tento filter nie sú vyhovujúce žiadne úlohy",

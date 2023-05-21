@@ -133,8 +133,6 @@ export abstract class TaskContentService implements OnDestroy {
      */
     public validateTaskData(): boolean {
 
-        console.log("VALIDATE TASK  DATA");
-
         if (!this._task || !this._task.dataGroups) {
             return false;
         }
@@ -163,8 +161,6 @@ export abstract class TaskContentService implements OnDestroy {
     }
 
     public validateDynamicEnumField(): boolean {
-
-        console.log("VALIDATE DZNAMIC ENUM FIELDS");
 
         if (!this._task || !this._task.dataGroups) {
             return false;
@@ -200,8 +196,6 @@ export abstract class TaskContentService implements OnDestroy {
      */
     public blockFields(blockingState: boolean): void {
 
-        console.log("UPDATE BLOCK FIELDS");
-
         if (this._task && this._task.dataGroups) {
             this._task.dataGroups.forEach(group => {
                 group.fields.forEach(field => {
@@ -216,8 +210,6 @@ export abstract class TaskContentService implements OnDestroy {
      */
     public updateStateData(eventOutcome: TaskEventOutcome): void {
 
-        console.log("UPDATE STATE DATA");
-
         if (this._task) {
             this._task.user = eventOutcome.task.user;
             this._task.startDate = eventOutcome.task.startDate;
@@ -230,8 +222,6 @@ export abstract class TaskContentService implements OnDestroy {
      * @param chFields object containing the delta of the changes from the previous state
      */
     public updateFromChangedFields(chFields: ChangedFields): void {
-
-        console.log("UPDATE FROM CHANGED FIELDS");
 
         if (!this._task || !this._task.dataGroups) {
             return;
@@ -256,8 +246,6 @@ export abstract class TaskContentService implements OnDestroy {
     }
 
     private updateField(chFields: ChangedFields, field: DataField<any>, frontendActions: Change): void {
-
-        console.log("UPDATE FIELDS");
 
         if (this._fieldConverterService.resolveType(field) === FieldTypeResource.TASK_REF) {
             this._taskDataReloadRequest$.next(frontendActions ? frontendActions : undefined);
@@ -320,8 +308,6 @@ export abstract class TaskContentService implements OnDestroy {
 
     private updateReferencedField(chFields: ChangedFields, field: DataField<any>, frontendActions: Change): void {
 
-        console.log("UPDATE REFERENCE FIELDS");
-
         if (this._fieldConverterService.resolveType(field) === FieldTypeResource.TASK_REF) {
             this._taskDataReloadRequest$.next(frontendActions ? frontendActions : undefined);
             return;
@@ -351,8 +337,6 @@ export abstract class TaskContentService implements OnDestroy {
      * @param frontendAction the action that should be performed.
      */
     public performFrontendAction(frontendAction: FrontendActions): void {
-
-        console.log("FRONT END ACTION : ", frontendAction);
 
         if (frontendAction && frontendAction.type === TaskContentService.VALIDATE_FRONTEND_ACTION) {
             timer().subscribe(() => this.validateTaskData());

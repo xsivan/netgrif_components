@@ -61,6 +61,7 @@ import {ChangedFieldsService} from '../../changed-fields/services/changed-fields
 import {createMockCase} from '../../utility/tests/utility/create-mock-case';
 import {createMockNet} from '../../utility/tests/utility/create-mock-net';
 import { OverflowService } from '../../header/services/overflow.service';
+import {FrontendActionsService} from "../../frontend-actions/services/frontend-actions.service";
 
 describe('AbtsractTaskPanelComponent', () => {
     let component: TestTaskPanelComponent;
@@ -111,6 +112,7 @@ describe('AbtsractTaskPanelComponent', () => {
                 AssignPolicyService,
                 FinishPolicyService,
                 OverflowService,
+                FrontendActionsService,
                 {provide: NAE_TASK_OPERATIONS, useClass: SubjectTaskOperations},
                 {
                     provide: AllowedNetsService,
@@ -210,11 +212,12 @@ class TestTaskPanelComponent extends AbstractTaskPanelComponent implements After
                 protected _currencyPipe: CurrencyPipe,
                 protected _changedFieldsService: ChangedFieldsService,
                 protected _permissionService: PermissionService,
-                protected _overflowService: OverflowService) {
+                protected _overflowService: OverflowService,
+                protected _frontendActionsService: FrontendActionsService) {
         super(_taskContentService, _log, _taskViewService, _paperView, _taskEventService, _assignTaskService,
             _delegateTaskService, _cancelTaskService, _finishTaskService, _taskState, _taskDataService,
             _assignPolicyService, _finishPolicyService, _callChain, _taskOperations, undefined, _translate, _currencyPipe, _changedFieldsService,
-            _permissionService, _overflowService);
+            _permissionService, _overflowService, _frontendActionsService);
     }
 
     ngAfterViewInit() {

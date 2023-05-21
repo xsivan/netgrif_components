@@ -27,20 +27,16 @@ export class EventQueueService {
     public scheduleEvent(event: QueuedEvent) {
         if (this._performingEvent.isActive) {
             this._log.debug(`Adding scheduled event to queue. Position in queue: ${this._queue.length}`);
-
             this._queue.push(event);
         } else {
             this._log.debug('Event queue is empty. Executing scheduled event immediately.');
-
             this._performingEvent.on();
             this.executeEvent(event);
         }
     }
 
     protected executeEvent(event: QueuedEvent) {
-        console.log("EventQueueService ->  executeEvent : ", event);
         event.resolve(this._afterActionService.create(() => {
-            console.log("EventQueueService ->  executeEvent -> resolve : ", event);
             this.executeNextEventFromQueue();
         }));
     }

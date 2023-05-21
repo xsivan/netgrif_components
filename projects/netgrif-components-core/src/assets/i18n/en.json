@@ -38,7 +38,11 @@
             "noLongerExists": "The selected task no longer exists",
             "caseDeleteFailed": "Case could not be deleted",
             "caseDeleteSuccess": "Case successfully deleted",
-            "rolesSuccessAssign": "Roles successfully assigned to selected users"
+            "rolesSuccessAssign": "Roles successfully assigned to selected users",
+            "openTask": "Opening task",
+            "openTaskSuccess": "Task successfully opened",
+            "closeTask": "Closing task",
+            "closeTaskSuccess": "Task successfully closed"
         },
         "view": {
             "noTasksSatisfyingThisFilter": "There are no tasks satisfying this filter",

@@ -96,15 +96,20 @@ export class TaskResourceService extends AbstractResourceService implements Coun
     }
 
     /**
-     * Open task
+     * Open task event
      * GET
      */
-    // {{baseUrl}}/api/task/finish/:id
     public openTask(taskId: string): Observable<EventOutcomeMessageResource> {
-
-        console.log("TASK RESOURCE -> openTask");
-
         return this._resourceProvider.get$('task/opentask/' + taskId, this.SERVER_URL)
+            .pipe(map(r => this.changeType(r, undefined)));
+    }
+
+    /**
+     * Close task event
+     * GET
+     */
+    public closeTask(taskId: string): Observable<EventOutcomeMessageResource> {
+        return this._resourceProvider.get$('task/closetask/' + taskId, this.SERVER_URL)
             .pipe(map(r => this.changeType(r, undefined)));
     }
 

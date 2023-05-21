@@ -36,6 +36,7 @@ import {ChangedFieldsMap} from '../../event/services/interfaces/changed-fields-m
 import {TaskFields} from '../../task-content/model/task-fields';
 import {EnumerationField} from "../../data-fields/enumeration-field/models/enumeration-field";
 import {OpenTaskService} from "./open-task.service";
+import {SubjectTaskOperations} from "../models/subject-task-operations";
 
 /**
  * Handles the loading and updating of data fields and behaviour of
@@ -106,31 +107,29 @@ export class TaskDataService extends TaskHandlingService implements OnDestroy {
      * @param afterAction if the request completes successfully emits `true` into the Subject, otherwise `false` will be emitted
      * @param force set to `true` if you need force reload of all task data
      */
-    public initializeTaskDataFields(afterAction: AfterAction = new AfterAction(), force = false): void {
-        // console.log("1 -  OPEN TASK - make variable");
-        //
-        // let kokos = new OpenTaskService(this._log,
-        //     this._taskResourceService,
-        //     this._snackBar,
-        //     this._translate,
-        //     this._taskState,
-        //     this._taskEvent,
-        //     this._eventQueue,
-        //     this._eventService,
-        //     this._changedFieldsService,
-        //     this._taskOperations,
-        //     this._selectedCaseService,
-        //     null,
-        //     this._taskContentService
-        // );
-        //
-        // console.log("1 -  OPEN TASK - start schedule");
-        //
-        // kokos.openTask();
+    public initializeTaskDataFields(afterAction: AfterAction = new AfterAction(), force = false, performOpenTaskActions: boolean = true): void {
 
-        this.
+        //Check if 'opentask' event can be performed
+        if(performOpenTaskActions) {
+            //Create openTaskService instance
+            let openTaskService = new OpenTaskService(this._log,
+                this._taskResourceService,
+                this._snackBar,
+                this._translate,
+                this._taskState,
+                this._taskEvent,
+                this._eventQueue,
+                this._eventService,
+                this._changedFieldsService,
+                this._taskOperations,
+                this._selectedCaseService,
+                null,
+                this._taskContentService
+            );
 
-        //console.log("2 -  GET DATA");
+            //Call 'opentask' event to be performed
+            openTaskService.openTask();
+        }
 
         this._eventQueue.scheduleEvent(new QueuedEvent(
             () => {
@@ -240,9 +239,6 @@ export class TaskDataService extends TaskHandlingService implements OnDestroy {
                     });
                     if (field instanceof FileField || field instanceof FileListField) {
                         field.changedFields$.subscribe((change: ChangedFieldsMap) => {
-
-                            console.log("XXXXXXXXXXX");
-
                             this._changedFieldsService.emitChangedFields(change);
                         });
                     }

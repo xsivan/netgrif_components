@@ -6,4 +6,5 @@ export enum TaskEvent {
     SET_DATA = 'set data',
     GET_DATA = 'get data',
     OPENTASK = 'opentask',
+    CLOSETASK = 'closetask',
 }

@@ -25,7 +25,8 @@ import {
     TaskViewService,
     PermissionService,
     ChangedFieldsService,
-    OverflowService
+    OverflowService,
+    FrontendActionsService, CloseTaskService
 } from '@netgrif/components-core';
 import {TaskContentComponent} from '../../task-content/task-content/task-content.component';
 import {TranslateService} from '@ngx-translate/core';
@@ -48,6 +49,8 @@ import {CurrencyPipe} from '@angular/common';
         AssignPolicyService,
         FinishPolicyService,
         ChangedFieldsService,
+        FrontendActionsService,
+        CloseTaskService,
         {provide: NAE_TASK_OPERATIONS, useClass: SubjectTaskOperations},
     ]
 })
@@ -75,11 +78,13 @@ export class TaskPanelComponent extends AbstractTaskPanelComponent {
                 protected _currencyPipe: CurrencyPipe,
                 protected _changedFieldsService: ChangedFieldsService,
                 protected _permissionService: PermissionService,
-                @Optional() overflowService: OverflowService) {
+                @Optional() overflowService: OverflowService,
+                protected _frontendActionsService: FrontendActionsService,
+                protected _closeTaskService: CloseTaskService) {
         super(_taskContentService, _log, _taskViewService, _paperView, _taskEventService, _assignTaskService,
             _delegateTaskService, _cancelTaskService, _finishTaskService, _taskState, _taskDataService,
             _assignPolicyService, _finishPolicyService, _callChain, _taskOperations, _disableFunctions, _translate, _currencyPipe, _changedFieldsService,
-            _permissionService, overflowService);
+            _permissionService, overflowService, _frontendActionsService, _closeTaskService);
     }
 
     protected createContentPortal(): void {

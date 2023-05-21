@@ -38,7 +38,11 @@
             "noLongerExists": "Die ausgewählte Aufgabe existiert nicht mehr",
             "caseDeleteFailed": "Fall konnte nicht gelöscht werden",
             "caseDeleteSuccess": "Fall erfolgreich gelöscht",
-            "rolesSuccessAssign": "Rollen, die ausgewählten Benutzern erfolgreich zugewiesen wurden"
+            "rolesSuccessAssign": "Rollen, die ausgewählten Benutzern erfolgreich zugewiesen wurden",
+            "openTask": "Beginnende Aufgabe",
+            "openTaskSuccess": "Aufgabe erfolgreich geöffnet",
+            "closeTask": "Abschließende Aufgabe",
+            "closeTaskSuccess": "Aufgabe erfolgreich abgeschlossen"
         },
         "view": {
             "noTasksSatisfyingThisFilter": "Es gibt keine Aufgaben, die den ausgewählten Filter erfüllen",

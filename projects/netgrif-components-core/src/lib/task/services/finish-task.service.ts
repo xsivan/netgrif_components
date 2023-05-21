@@ -62,12 +62,13 @@ export class FinishTaskService extends TaskHandlingService {
      */
     public validateDataAndFinish(afterAction: AfterAction = new AfterAction()): void {
         if (this.dataIsEmpty()) {
+            //call initializeTaskDataFields method with param performOpenTaskActions as false, so 'opentask' event wont be called again
             this._taskDataService.initializeTaskDataFields(this._callChain.create(() => {
                 if (this._safeTask.dataSize <= 0 ||
                     (this._taskContentService.validateDynamicEnumField() && this._taskContentService.validateTaskData())) {
                     this.queueFinishTaskRequest(afterAction);
                 }
-            }));
+            }), false, false);
         } else if (this._taskContentService.validateDynamicEnumField() && this._taskContentService.validateTaskData()) {
             const finishedTaskId = this._safeTask.stringId;
             this._taskDataService.updateTaskDataFields(this._callChain.create(success => {

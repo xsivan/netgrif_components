@@ -48,6 +48,9 @@ import {ChangedFieldsMap} from '../../event/services/interfaces/changed-fields-m
 import { TaskPanelContext } from './models/task-panel-context';
 import {OverflowService} from '../../header/services/overflow.service';
 import { FinishPolicyService } from '../../task/services/finish-policy.service';
+import {FrontendActionsService} from "../../frontend-actions/services/frontend-actions.service";
+import {AfterAction} from "../../utility/call-chain/after-action";
+import {CloseTaskService} from "../../task/services/close-task-service";
 
 @Component({
     selector: 'ncc-abstract-legal-notice',
@@ -134,7 +137,9 @@ export abstract class AbstractTaskPanelComponent extends AbstractPanelWithImmedi
                           protected _currencyPipe: CurrencyPipe,
                           protected _changedFieldsService: ChangedFieldsService,
                           protected _permissionService: PermissionService,
-                          @Optional() overflowService: OverflowService) {
+                          @Optional() overflowService: OverflowService,
+                          protected _frontendActionsService: FrontendActionsService,
+                          protected _closeTaskService: CloseTaskService) {
         super(_translate, _currencyPipe, overflowService);
         this.taskEvent = new EventEmitter<TaskEventNotification>();
         this.panelRefOutput = new EventEmitter<MatExpansionPanel>();
@@ -143,38 +148,34 @@ export abstract class AbstractTaskPanelComponent extends AbstractPanelWithImmedi
         });
         this._subTaskData = _changedFieldsService.changedFields$.subscribe((changedFieldsMap: ChangedFieldsMap) => {
 
-            console.log("********_1_**********");
-            console.log("TU 1 : ", changedFieldsMap);
-            console.log("TU 2 : ", this._taskContentService.referencedTaskAndCaseIds);
-
             const filteredCaseIds: Array<string> = Object.keys(changedFieldsMap).filter(
                 caseId => Object.keys(this._taskContentService.referencedTaskAndCaseIds).includes(caseId)
             );
 
-            console.log("********_2_**********");
-            console.log("filteredCaseIds : ", filteredCaseIds);
-
             const changedFields: Array<ChangedFields> = [];
             filteredCaseIds.forEach(caseId => {
-
-                console.log("********_3_**********");
 
                 const taskIds: Array<string> = this._taskContentService.referencedTaskAndCaseIds[caseId];
                 changedFields.push(...this._changedFieldsService.parseChangedFieldsByCaseAndTaskIds(caseId, taskIds, changedFieldsMap));
             });
 
-            console.log("********_4_**********");
 
             changedFields.filter(fields => fields !== undefined).forEach(fields => {
-
-                console.log("********_5_**********");
-
                this.taskPanelData.changedFields.next(fields);
             });
 
+            //Get task id from Task object
+            let taskStringId: Array<string> = [this._taskContentService.task.stringId]
 
+            //Parse changeFieldMap value by provided task id, case id
+            const taskChangedFields: Array<ChangedFields> = this._changedFieldsService.parseChangedFieldsByCaseAndTaskIds(
+                this._taskContentService.task.caseId,
+                taskStringId,
+                changedFieldsMap
+            );
 
-            console.log("********_6_**********");
+            //Filter and handle frontend actions
+            this._frontendActionsService.filterAndHandleFrontendActions(taskChangedFields);
         });
         _taskOperations.open$.subscribe(() => {
             this.expand();
@@ -225,6 +226,8 @@ export abstract class AbstractTaskPanelComponent extends AbstractPanelWithImmedi
             }
         });
         this.panelRef.closed.subscribe(() => {
+            this._closeTaskService.closeTask();
+
             if (!this._taskState.isLoading()) {
                 this._assignPolicyService.performAssignPolicy(false);
             }
@@ -282,7 +285,8 @@ export abstract class AbstractTaskPanelComponent extends AbstractPanelWithImmedi
     assign() {
         this._assignTaskService.assign(this._callChain.create((afterAction => {
             if (afterAction) {
-                this._taskDataService.initializeTaskDataFields();
+                //Set param perfromOpenTaskActions to false, so opentask event wont be called again
+                this._taskDataService.initializeTaskDataFields(new AfterAction(), false, false);
                 this._finishPolicyService.performFinishPolicy();
             }
         })));
@@ -302,7 +306,7 @@ export abstract class AbstractTaskPanelComponent extends AbstractPanelWithImmedi
     finish() {
         if (!this._taskContentService.validateTaskData()) {
             if (this._taskContentService.task.dataSize <= 0) {
-                this._taskDataService.initializeTaskDataFields();
+                this._taskDataService.initializeTaskDataFields(new AfterAction(), false, false);
             }
             const invalidFields = this._taskContentService.getInvalidTaskData();
             document.getElementById(invalidFields[0].stringId).scrollIntoView({

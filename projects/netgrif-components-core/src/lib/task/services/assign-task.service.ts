@@ -86,12 +86,6 @@ export class AssignTaskService extends TaskHandlingService {
     protected performAssignRequest(afterAction: AfterAction, nextEvent: AfterAction, forceReload: boolean) {
         const assignedTaskId = this._safeTask.stringId;
 
-        // this is probably no longer necessary because of the event queue
-        if (this._taskState.isLoading(assignedTaskId)) {
-            nextEvent.resolve(true);
-            return;
-        }
-
         this._taskState.startLoading(assignedTaskId);
         this.assignRequest(afterAction, assignedTaskId, nextEvent, forceReload);
     }
@@ -154,9 +148,9 @@ export class AssignTaskService extends TaskHandlingService {
                 }
 
                 this._snackBar.openErrorSnackBar(`${this._translate.instant('tasks.snackbar.assignTask')}
-             ${this._taskContentService.task} ${this._translate.instant('tasks.snackbar.failed')}`);
+                    ${this._taskContentService.task} ${this._translate.instant('tasks.snackbar.failed')}`);
                 this.completeActions(afterAction, nextEvent, false);
-            });
+                });
     }
 
     /**

@@ -1,9 +1,9 @@
 /**
- * Service that handles the logic of FrontEnd event OPEN (expand) task.
+ * Service that handles the logic of FrontEnd event CLOSE (collapse) task.
  *
- * To by precise, this service handle creating, scheduling OPEN task event and handle returned outcome from BackEnd.
- * BUT ... it's all about procesing reaction bind to this event, and have NOTHING to do with real opening of task (with that action).
- */
+ * To by precise, this service handle creating, scheduling CLOSE task event and handle returned outcome from BackEnd.
+ * BUT ... it's all about procesing reaction bind to this event, and have NOTHING to do with real closing of task (with that action).
+ *  */
 
 import {Inject, Injectable, Optional} from "@angular/core";
 import {TaskHandlingService} from "./task-handling-service";
@@ -26,13 +26,13 @@ import {QueuedEvent} from "../../event-queue/model/queued-event";
 import {take} from "rxjs/operators";
 import {EventOutcomeMessageResource} from "../../resources/interface/message-resource";
 import {ChangedFieldsMap} from "../../event/services/interfaces/changed-fields-map";
-import {OpenTaskEventOutcome} from "../../event/model/event-outcomes/task-outcomes/open-task-event-outcome";
 import {TaskEventOutcome} from "../../event/model/event-outcomes/task-outcomes/task-event-outcome";
 import {createTaskEventNotification} from "../../task-content/model/task-event-notification";
 import {TaskEvent} from "../../task-content/model/task-event";
+import {CloseTaskEventOutcome} from "../../event/model/event-outcomes/task-outcomes/close-task-event-outcome";
 
 @Injectable()
-export class OpenTaskService extends TaskHandlingService {
+export class CloseTaskService extends TaskHandlingService {
 
     constructor(protected _log: LoggerService,
                 protected _taskResourceService: TaskResourceService,
@@ -51,25 +51,25 @@ export class OpenTaskService extends TaskHandlingService {
     }
 
     /**
-     * Performs the 'opentask' event call.
+     * Performs the 'closetask' event call.
      *
      * Doesn't send any requests if the loading indicator is in it's active state.
      * Otherwise sets the indicator to the active state and disables it once the request response is received.
      *
      * The argument can be used to chain operations together,
-     * or to execute code conditionally based on the success state of the 'opentask' operation.
+     * or to execute code conditionally based on the success state of the 'closetask' operation.
      *
      * If the task held within the {@link TaskContentService} changes before a response is received, the response will be ignored
      * and the `afterAction` will not be executed.
-     * @param afterAction if 'opentask' completes successfully `true` will be emitted into this Subject, otherwise `false` will be emitted
+     * @param afterAction if 'closetask' completes successfully `true` will be emitted into this Subject, otherwise `false` will be emitted
      */
-    public openTask(afterAction: AfterAction = new AfterAction()): void {
+    public closeTask(afterAction: AfterAction = new AfterAction()): void {
         this._eventQueue.scheduleEvent(new QueuedEvent(
             () => {
                 return this.isTaskPresent();
             },
             nextEvent => {
-                this.performOpenRequest(afterAction, nextEvent, this._taskViewService !== null && !this._taskViewService.allowMultiOpen);
+                this.performCloseRequest(afterAction, nextEvent, this._taskViewService !== null && !this._taskViewService.allowMultiOpen);
             },
             nextEvent => {
                 this.completeSuccess(afterAction, nextEvent);
@@ -78,59 +78,59 @@ export class OpenTaskService extends TaskHandlingService {
     }
 
     /**
-     * Performs an `opentask` request on the task currently stored in the `taskContent` service
+     * Performs an `closetask` request on the task currently stored in the `taskContent` service
      * @param afterAction the action that should be performed after the request is processed
      * @param nextEvent indicates to the event queue that the next event can be processed
-     * @param forceReload whether a force reload of the task data should be performed after 'opentask'.
+     * @param forceReload whether a force reload of the task data should be performed after 'closetask'.
      * If set to `false` a regular reload is performed instead.
      */
-    protected performOpenRequest(afterAction: AfterAction, nextEvent: AfterAction, forceReload: boolean) {
-        //Get id of task , on witch we want perfrom 'opentask' event
-        const openedTaskId = this._safeTask.stringId;
+    protected performCloseRequest(afterAction: AfterAction, nextEvent: AfterAction, forceReload: boolean) {
+        //Get id of task , on witch we want perfrom 'closetask' event
+        const closedTaskId = this._safeTask.stringId;
 
         //Changes the state of the loading indicator to `true`
-        this._taskState.startLoading(openedTaskId);
+        this._taskState.startLoading(closedTaskId);
 
         //Calls the endpoint and processes the possible responses
-        this.openRequest(afterAction, openedTaskId, nextEvent, forceReload);
+        this.closeRequest(afterAction, closedTaskId, nextEvent, forceReload);
     }
 
     /**
      * Calls the endpoint and processes the possible responses.
      * @param afterAction the action that should be performed after the request is processed
-     * @param openedTaskId the id of the task that 'opentask' event should be called
+     * @param closedTaskId the id of the task that 'closetask' event should be called
      * @param nextEvent indicates to the event queue that the next event can be processed
-     * @param forceReload whether a force reload of the task data should be performed after 'opentask'.
+     * @param forceReload whether a force reload of the task data should be performed after 'closetask'.
      * If set to `false` a regular reload is performed instead.
      */
-    protected openRequest(afterAction: AfterAction = new AfterAction(),
-                            openedTaskId: string,
-                            nextEvent: AfterAction = new AfterAction(),
-                            forceReload: boolean) {
+    protected closeRequest(afterAction: AfterAction = new AfterAction(),
+                           closedTaskId: string,
+                          nextEvent: AfterAction = new AfterAction(),
+                          forceReload: boolean) {
 
-        this._taskResourceService.openTask(this._safeTask.stringId).pipe(take(1))
+        this._taskResourceService.closeTask(this._safeTask.stringId).pipe(take(1))
             .subscribe((outcomeResource: EventOutcomeMessageResource) => {
 
-                //The next part of code is run when NO error occured during 'opentask' event call
-                //It still doesn't guarantee succesfull execution of 'opentask' event
+                //The next part of code is run when NO error occured during 'closetask' event call
+                //It still doesn't guarantee succesfull execution of 'closetask' event
 
                 //Changes the state of the loading indicator to `false`
-                this._taskState.stopLoading(openedTaskId);
+                this._taskState.stopLoading(closedTaskId);
 
                 //Check if this task in this state is still relevant
                 //If no, emits the resolution as false and completes
-                if (!this.isTaskRelevant(openedTaskId)) {
-                    this._log.debug('current task changed before the open task event response could be received, discarding...');
+                if (!this.isTaskRelevant(closedTaskId)) {
+                    this._log.debug('current task changed before the closetask event response could be received, discarding...');
                     nextEvent.resolve(false);
                     return;
                 }
 
                 //Check if returned message from server is ERROR type or SUCCESS type
                 if (outcomeResource.success) {
-                    //Returned message is SUCCESS type, that means 'opentask' event execution was successfull
+                    //Returned message is SUCCESS type, that means 'closetask' event execution was successfull
 
                     //Clears the assignee, start date and finish date from the managed Task
-                    this._taskContentService.updateStateData(outcomeResource.outcome as OpenTaskEventOutcome);
+                    this._taskContentService.updateStateData(outcomeResource.outcome as CloseTaskEventOutcome);
 
                     //Convert outcome data from tree to map
                     const changedFieldsMap: ChangedFieldsMap = this._eventService
@@ -146,14 +146,14 @@ export class OpenTaskService extends TaskHandlingService {
 
                     //Complete all action streams and send notification with value 'true' (event execution successed)
                     //Add outcome to notfication
-                    this.completeActions(afterAction, nextEvent, true, outcomeResource.outcome as OpenTaskEventOutcome);
+                    this.completeActions(afterAction, nextEvent, true, outcomeResource.outcome as CloseTaskEventOutcome);
 
                     //Show to user success snackbar with success message in current selected languge
                     this._snackBar.openSuccessSnackBar(!!outcomeResource.outcome.message
                         ? outcomeResource.outcome.message
-                        : this._translate.instant('tasks.snackbar.openTaskSuccess'));
+                        : this._translate.instant('tasks.snackbar.closeTaskSuccess'));
                 } else if (outcomeResource.error) {
-                    //Returned message is ERROR type, that means 'opentask' event execution failed
+                    //Returned message is ERROR type, that means 'closetask' event execution failed
 
                     //If message contain any text, show it via error snackbar to user
                     if (outcomeResource.error !== '') {
@@ -171,23 +171,23 @@ export class OpenTaskService extends TaskHandlingService {
                 }
 
             }, error => {
-                //The error part of code is run when error occured during 'opentask' event call
+                //The error part of code is run when error occured during 'closetask' event call
                 //For example error 403 when actual user does not have right for this event on this task
 
                 //Changes the state of the loading indicator to `false`
-                this._taskState.stopLoading(openedTaskId);
-                this._log.debug('open task failed', error);
+                this._taskState.stopLoading(closedTaskId);
+                this._log.debug('close task event failed', error);
 
                 //Check if this task in this state is still relevant
                 //If no, emits the resolution as false and completes
-                if (!this.isTaskRelevant(openedTaskId)) {
-                    this._log.debug('current task changed before the openTask event error could be received');
+                if (!this.isTaskRelevant(closedTaskId)) {
+                    this._log.debug('current task changed before the closeTask event error could be received');
                     nextEvent.resolve(false);
                     return;
                 }
 
                 //Show to user error snackbar with error message in current selected languge
-                this._snackBar.openErrorSnackBar(`${this._translate.instant('tasks.snackbar.openTask')}
+                this._snackBar.openErrorSnackBar(`${this._translate.instant('tasks.snackbar.closeTask')}
                     ${this._taskContentService.task} ${this._translate.instant('tasks.snackbar.failed')}`);
 
                 //Complete all action streams and send notification with value 'false'
@@ -205,12 +205,12 @@ export class OpenTaskService extends TaskHandlingService {
     }
 
     /**
-     * Publishes a 'opentask' notification to the {@link TaskEventService}
+     * Publishes a 'closetask' notification to the {@link TaskEventService}
      * @param success whether the cancel operation was successful or not
      * @param outcome
      */
     protected sendNotification(success: boolean, outcome?: TaskEventOutcome): void {
-        this._taskEvent.publishTaskEvent(createTaskEventNotification(this._safeTask, TaskEvent.OPENTASK, success, outcome));
+        this._taskEvent.publishTaskEvent(createTaskEventNotification(this._safeTask, TaskEvent.CLOSETASK, success, outcome));
     }
 
     /**
